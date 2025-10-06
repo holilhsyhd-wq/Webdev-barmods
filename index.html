@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Tracking Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 32px;
+            text-align: center;
+        }
+        
+        .link-generator {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a2a6c;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #1a2a6c;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .tracking-data {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .tracking-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .tracking-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tracking-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .info-item {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #1a2a6c;
+        }
+        
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #1a2a6c;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .photo-preview:hover {
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 10px;
+        }
+        
+        .close-modal {
+            margin-top: 15px;
+            background: #dc3545;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #e9ecef;
+        }
+        
+        @media (max-width: 768px) {
+            .tracking-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .info-item {
+                min-width: auto;
+            }
+            
+            header, .link-generator, .tracking-data {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>🎯 Admin Tracking Dashboard</h1>
+            <p style="text-align: center; color: #666; margin-top: 10px;">
+                Create tracking links and monitor all captured data
+            </p>
+        </header>
+        
+        <div class="link-generator">
+            <h2 style="margin-bottom: 20px; color: #1a2a6c;">🔗 Create New Tracking Link</h2>
+            <div class="form-group">
+                <label for="campaign-name">Campaign Name</label>
+                <input type="text" id="campaign-name" placeholder="Enter campaign name (e.g., Summer Sale 2024)">
+            </div>
+            <div class="form-group">
+                <label for="target-url">Target URL (Optional)</label>
+                <input type="text" id="target-url" placeholder="https://example.com (leave empty for camera only)">
+            </div>
+            <button id="generate-link" class="btn">Generate Tracking Link</button>
+            
+            <div id="generated-link-container" style="margin-top: 20px; display: none;">
+                <label>Generated Tracking Link:</label>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="generated-link" readonly style="flex: 1;">
+                    <button id="copy-link" class="btn copy-btn">Copy</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tracking-data">
+            <div class="data-header">
+                <h2 style="color: #1a2a6c;">📊 Tracking Data</h2>
+                <span id="total-tracks">Total: 0 entries</span>
+            </div>
+            
+            <div id="tracking-list">
+                <!-- Tracking data will be populated here -->
+                <div class="empty-state">
+                    <div>📁</div>
+                    <h3>No tracking data yet</h3>
+                    <p>Generated tracking links will appear here when users interact with them</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="photo-modal" class="modal">
+        <div class="modal-content">
+            <img id="modal-photo" src="" alt="Captured photo">
+            <button class="btn close-modal">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Mock data storage (in real app, this would be from your database)
+        let trackingData = JSON.parse(localStorage.getItem('trackingData')) || [];
+        let linkCounter = parseInt(localStorage.getItem('linkCounter') || '0');
+        
+        // DOM Elements
+        const generateLinkBtn = document.getElementById('generate-link');
+        const campaignNameInput = document.getElementById('campaign-name');
+        const targetUrlInput = document.getElementById('target-url');
+        const generatedLinkContainer = document.getElementById('generated-link-container');
+        const generatedLinkInput = document.getElementById('generated-link');
+        const copyLinkBtn = document.getElementById('copy-link');
+        const trackingList = document.getElementById('tracking-list');
+        const totalTracks = document.getElementById('total-tracks');
+        const photoModal = document.getElementById('photo-modal');
+        const modalPhoto = document.getElementById('modal-photo');
+        const closeModalBtn = document.querySelector('.close-modal');
+        
+        // Generate tracking link
+        generateLinkBtn.addEventListener('click', () => {
+            const campaignName = campaignNameInput.value.trim();
+            const targetUrl = targetUrlInput.value.trim();
+            
+            if (!campaignName) {
+                alert('Please enter a campaign name');
+                return;
+            }
+            
+            linkCounter++;
+            localStorage.setItem('linkCounter', linkCounter.toString());
+            
+            // Generate unique tracking ID
+            const trackingId = `track_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const baseUrl = window.location.origin + window.location.pathname;
+            const trackingLink = `${baseUrl}?tracking_id=${trackingId}&campaign=${encodeURIComponent(campaignName)}${targetUrl ? `&redirect=${encodeURIComponent(targetUrl)}` : ''}`;
+            
+            generatedLinkInput.value = trackingLink;
+            generatedLinkContainer.style.display = 'block';
+            
+            // Reset form
+            campaignNameInput.value = '';
+            targetUrlInput.value = '';
+        });
+        
+        // Copy link to clipboard
+        copyLinkBtn.addEventListener('click', () => {
+            generatedLinkInput.select();
+            document.execCommand('copy');
+            copyLinkBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyLinkBtn.textContent = 'Copy';
+            }, 2000);
+        });
+        
+        // Add mock tracking data (simulate user interactions)
+        function addMockTrackingData() {
+            const mockData = [
+                {
+                    id: 'track_1',
+                    campaign: 'Summer Sale 2024',
+                    timestamp: new Date(Date.now() - 3600000).toISOString(),
+                    ipAddress: '192.168.1.100',
+                    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    photo: 'https://placehold.co/400x300/1a2a6c/white?text=Photo+1'
+                },
+                {
+                    id: 'track_2',
+                    campaign: 'Newsletter Signup',
+                    timestamp: new Date(Date.now() - 7200000).toISOString(),
+                    ipAddress: '192.168.1.101',
+                    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)',
+                    photo: 'https://placehold.co/400x300/b21f1f/white?text=Photo+2'
+                },
+                {
+                    id: 'track_3',
+                    campaign: 'Product Launch',
+                    timestamp: new Date(Date.now() - 10800000).toISOString(),
+                    ipAddress: '192.168.1.102',
+                    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+                    photo: 'https://placehold.co/400x300/28a745/white?text=Photo+3'
+                }
+            ];
+            
+            // Add to tracking data if empty
+            if (trackingData.length === 0) {
+                trackingData = mockData;
+                localStorage.setItem('trackingData', JSON.stringify(trackingData));
+                renderTrackingData();
+            }
+        }
+        
+        // Render tracking data
+        function renderTrackingData() {
+            if (trackingData.length === 0) {
+                trackingList.innerHTML = `
+                    <div class="empty-state">
+                        <div>📁</div>
+                        <h3>No tracking data yet</h3>
+                        <p>Generated tracking links will appear here when users interact with them</p>
+                    </div>
+                `;
+                totalTracks.textContent = 'Total: 0 entries';
+                return;
+            }
+            
+            totalTracks.textContent = `Total: ${trackingData.length} entries`;
+            
+            trackingList.innerHTML = trackingData.map(item => {
+                const date = new Date(item.timestamp);
+                return `
+                    <div class="tracking-item">
+                        <div class="tracking-info">
+                            <div class="info-item">
+                                <div class="info-label">Campaign</div>
+                                <div class="info-value">${item.campaign}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Date & Time</div>
+                                <div class="info-value">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">IP Address</div>
+                                <div class="info-value">${item.ipAddress}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="${item.photo}" alt="Captured photo" class="photo-preview" data-photo="${item.photo}">
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; color: #6c757d;">
+                            User Agent: ${item.userAgent.substring(0, 50)}...
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click event to photo previews
+            document.querySelectorAll('.photo-preview').forEach(img => {
+                img.addEventListener('click', () => {
+                    modalPhoto.src = img.dataset.photo;
+                    photoModal.style.display = 'flex';
+                });
+            });
+        }
+        
+        // Close modal
+        closeModalBtn.addEventListener('click', () => {
+            photoModal.style.display = 'none';
+        });
+        
+        photoModal.addEventListener('click', (e) => {
+            if (e.target === photoModal) {
+                photoModal.style.display = 'none';
+            }
+        });
+        
+        // Initialize
+        addMockTrackingData();
+        renderTrackingData();
+        
+        // Simulate new tracking data (for demo purposes)
+        setInterval(() => {
+            if (Math.random() > 0.8 && trackingData.length < 10) {
+                const newEntry = {
+                    id: `track_${Date.now()}`,
+                    campaign: `Auto Campaign ${trackingData.length + 1}`,
+                    timestamp: new Date().toISOString(),
+                    ipAddress: `192.168.1.${100 + trackingData.length}`,
+                    userAgent: 'Mozilla/5.0 (Demo User Agent)',
+                    photo: `https://placehold.co/400x300/${Math.floor(Math.random()*16777215).toString(16)}/white?text=Demo+${trackingData.length + 1}`
+                };
+                trackingData.unshift(newEntry);
+                localStorage.setItem('trackingData', JSON.stringify(trackingData));
+                renderTrackingData();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
