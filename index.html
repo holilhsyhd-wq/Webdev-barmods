@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Tracking Dashboard</title>
+    <title>Camera Tracking System</title>
     <style>
         * {
             margin: 0;
@@ -13,38 +13,49 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
             min-height: 100vh;
-            color: #333;
         }
         
+        /* Admin Page Styles */
         .admin-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
         }
         
-        header {
+        .admin-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        h1 {
-            color: #1a2a6c;
-            margin-bottom: 20px;
-            font-size: 32px;
             text-align: center;
         }
         
-        .link-generator {
+        .admin-header h1 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+        
+        .admin-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .link-generator, .tracking-data {
             background: white;
-            padding: 30px;
             border-radius: 20px;
-            margin-bottom: 30px;
+            padding: 30px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
         
@@ -65,7 +76,6 @@
             border: 2px solid #ddd;
             border-radius: 12px;
             font-size: 16px;
-            transition: border-color 0.3s;
         }
         
         input[type="text"]:focus {
@@ -81,35 +91,20 @@
             font-size: 16px;
             border-radius: 12px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
             font-weight: 600;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.4);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
         }
         
         .copy-btn {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
         
-        .tracking-data {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .data-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        .refresh-btn {
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
         }
         
         .tracking-item {
@@ -118,83 +113,6 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 15px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .tracking-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .tracking-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .info-item {
-            flex: 1;
-            min-width: 150px;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            font-weight: 500;
-            color: #1a2a6c;
-        }
-        
-        .photo-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid #1a2a6c;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .photo-preview:hover {
-            transform: scale(1.05);
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            max-width: 800px;
-            width: 90%;
-            text-align: center;
-        }
-        
-        .modal img {
-            max-width: 100%;
-            max-height: 70vh;
-            border-radius: 10px;
-        }
-        
-        .close-modal {
-            margin-top: 15px;
-            background: #dc3545;
         }
         
         .empty-state {
@@ -203,88 +121,181 @@
             color: #6c757d;
         }
         
-        .empty-state i {
-            font-size: 60px;
-            margin-bottom: 20px;
-            color: #e9ecef;
+        /* Tracking Page Styles */
+        .tracking-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
-        @media (max-width: 768px) {
-            .tracking-info {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .info-item {
-                min-width: auto;
-            }
-            
-            header, .link-generator, .tracking-data {
-                padding: 20px;
-            }
+        .tracking-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .tracking-card h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        
+        #video {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            border-radius: 15px;
+            border: 3px solid #667eea;
+            background: #000;
+            margin: 20px 0;
+        }
+        
+        .capture-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        
+        .success-message {
+            color: #28a745;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        
+        .error {
+            color: #dc3545;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        /* Common Styles */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <header>
-            <h1>🎯 Admin Tracking Dashboard</h1>
-            <p style="text-align: center; color: #666; margin-top: 10px;">
-                Create tracking links and monitor all captured data
-            </p>
-        </header>
-        
-        <div class="link-generator">
-            <h2 style="margin-bottom: 20px; color: #1a2a6c;">🔗 Create New Tracking Link</h2>
-            <div class="form-group">
-                <label for="campaign-name">Campaign Name</label>
-                <input type="text" id="campaign-name" placeholder="Enter campaign name (e.g., Summer Sale 2024)">
+    <!-- Admin Page -->
+    <div id="admin-page" class="hidden">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>🎯 Admin Tracking Dashboard</h1>
+                <p>Create tracking links and monitor all captured data</p>
             </div>
-            <div class="form-group">
-                <label for="target-url">Target URL (Optional)</label>
-                <input type="text" id="target-url" placeholder="https://example.com (leave empty for camera only)">
-            </div>
-            <button id="generate-link" class="btn">Generate Tracking Link</button>
             
-            <div id="generated-link-container" style="margin-top: 20px; display: none;">
-                <label>Generated Tracking Link:</label>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <input type="text" id="generated-link" readonly style="flex: 1;">
-                    <button id="copy-link" class="btn copy-btn">Copy</button>
+            <div class="admin-content">
+                <div class="link-generator">
+                    <h2 style="margin-bottom: 20px; color: #1a2a6c;">🔗 Create New Tracking Link</h2>
+                    <div class="form-group">
+                        <label for="campaign-name">Campaign Name</label>
+                        <input type="text" id="campaign-name" placeholder="Enter campaign name">
+                    </div>
+                    <div class="form-group">
+                        <label for="target-url">Target URL (Optional)</label>
+                        <input type="text" id="target-url" placeholder="https://example.com">
+                    </div>
+                    <button id="generate-link" class="btn">Generate Tracking Link</button>
+                    
+                    <div id="generated-link-container" style="margin-top: 20px; display: none;">
+                        <label>Generated Tracking Link:</label>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="text" id="generated-link" readonly>
+                            <button id="copy-link" class="btn copy-btn">Copy</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="tracking-data">
-            <div class="data-header">
-                <h2 style="color: #1a2a6c;">📊 Tracking Data</h2>
-                <span id="total-tracks">Total: 0 entries</span>
-            </div>
-            
-            <div id="tracking-list">
-                <!-- Tracking data will be populated here -->
-                <div class="empty-state">
-                    <div>📁</div>
-                    <h3>No tracking data yet</h3>
-                    <p>Generated tracking links will appear here when users interact with them</p>
+                
+                <div class="tracking-data">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #1a2a6c;">📊 Tracking Data</h2>
+                        <div style="display: flex; gap: 10px;">
+                            <span id="total-tracks">Total: 0 entries</span>
+                            <button id="refresh-data" class="btn refresh-btn">🔄 Refresh</button>
+                        </div>
+                    </div>
+                    
+                    <div id="tracking-list">
+                        <div class="empty-state">
+                            <h3>No tracking data yet</h3>
+                            <p>Generated tracking links will appear here when users interact with them</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div id="photo-modal" class="modal">
-        <div class="modal-content">
-            <img id="modal-photo" src="" alt="Captured photo">
-            <button class="btn close-modal">Close</button>
+
+    <!-- Tracking Page -->
+    <div id="tracking-page" class="hidden">
+        <div class="tracking-container">
+            <div class="tracking-card">
+                <h1>📸 Camera Access Required</h1>
+                
+                <div class="warning">
+                    <strong>Privacy Notice:</strong> This website requests access to your camera to capture a photo. 
+                    Your photo will only be taken if you explicitly grant permission and click the capture button.
+                </div>
+                
+                <p style="color: #666; margin-bottom: 30px; line-height: 1.6;">
+                    To proceed, please grant camera access by clicking the button below.
+                </p>
+                
+                <button id="request-camera" class="btn">Grant Camera Access</button>
+                
+                <div id="error-message" class="error"></div>
+                
+                <div id="camera-section" class="hidden">
+                    <video id="video" autoplay playsinline></video>
+                    <button id="capture-btn" class="btn capture-btn">📸 Capture Photo</button>
+                </div>
+                
+                <div id="result-section" class="hidden">
+                    <p class="success-message">✅ Photo captured successfully!</p>
+                    <p style="margin-top: 10px; color: #666;">Thank you for your participation.</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Mock data storage (in real app, this would be from your database)
-        let trackingData = JSON.parse(localStorage.getItem('trackingData')) || [];
-        let linkCounter = parseInt(localStorage.getItem('linkCounter') || '0');
+        // In-memory storage (since localStorage is not supported)
+        let trackingData = [];
+        let linkCounter = 0;
+        
+        // Get URL parameters correctly
+        const url = new URL(window.location.href);
+        const urlParams = new URLSearchParams(url.search);
+        const trackingId = urlParams.get('tracking_id');
+        const campaign = urlParams.get('campaign');
+        const redirectUrl = urlParams.get('redirect');
         
         // DOM Elements
+        const adminPage = document.getElementById('admin-page');
+        const trackingPage = document.getElementById('tracking-page');
+        const requestCameraBtn = document.getElementById('request-camera');
+        const cameraSection = document.getElementById('camera-section');
+        const resultSection = document.getElementById('result-section');
+        const video = document.getElementById('video');
+        const captureBtn = document.getElementById('capture-btn');
+        const errorMessage = document.getElementById('error-message');
         const generateLinkBtn = document.getElementById('generate-link');
         const campaignNameInput = document.getElementById('campaign-name');
         const targetUrlInput = document.getElementById('target-url');
@@ -293,11 +304,79 @@
         const copyLinkBtn = document.getElementById('copy-link');
         const trackingList = document.getElementById('tracking-list');
         const totalTracks = document.getElementById('total-tracks');
-        const photoModal = document.getElementById('photo-modal');
-        const modalPhoto = document.getElementById('modal-photo');
-        const closeModalBtn = document.querySelector('.close-modal');
+        const refreshDataBtn = document.getElementById('refresh-data');
         
-        // Generate tracking link
+        // FIXED: Correct routing logic
+        if (trackingId && trackingId.startsWith('track_')) {
+            // Show tracking page - this is a tracking link
+            trackingPage.classList.remove('hidden');
+            document.title = 'Camera Tracking - ' + (campaign ? decodeURIComponent(campaign) : 'Unknown Campaign');
+        } else {
+            // Show admin page - no tracking ID or invalid ID
+            adminPage.classList.remove('hidden');
+            document.title = 'Admin Tracking Dashboard';
+            renderTrackingData();
+        }
+        
+        // Tracking Page Functions
+        let stream = null;
+        
+        requestCameraBtn.addEventListener('click', async () => {
+            try {
+                errorMessage.style.display = 'none';
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                    audio: false 
+                });
+                video.srcObject = stream;
+                cameraSection.classList.remove('hidden');
+                requestCameraBtn.classList.add('hidden');
+            } catch (error) {
+                errorMessage.textContent = '❌ Camera access denied or not available.';
+                errorMessage.style.display = 'block';
+            }
+        });
+        
+        captureBtn.addEventListener('click', () => {
+            if (!stream) return;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageDataUrl = canvas.toDataURL('image/jpeg');
+            
+            // Save to in-memory "database"
+            const newEntry = {
+                id: trackingId,
+                campaign: campaign ? decodeURIComponent(campaign) : 'Unknown',
+                timestamp: new Date().toISOString(),
+                ipAddress: '192.168.1.' + Math.floor(Math.random() * 254 + 1), // Mock IP
+                userAgent: navigator.userAgent,
+                photo: imageDataUrl,
+                redirectUrl: redirectUrl ? decodeURIComponent(redirectUrl) : null
+            };
+            
+            trackingData.unshift(newEntry);
+            console.log('Photo captured and saved to memory:', newEntry);
+            
+            // Show success
+            cameraSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            
+            // Stop camera
+            stream.getTracks().forEach(track => track.stop());
+            
+            // Redirect if specified
+            if (redirectUrl) {
+                setTimeout(() => {
+                    window.location.href = decodeURIComponent(redirectUrl);
+                }, 2000);
+            }
+        });
+        
+        // Admin Page Functions
         generateLinkBtn.addEventListener('click', () => {
             const campaignName = campaignNameInput.value.trim();
             const targetUrl = targetUrlInput.value.trim();
@@ -308,76 +387,36 @@
             }
             
             linkCounter++;
-            localStorage.setItem('linkCounter', linkCounter.toString());
+            const trackingId = `track_${Date.now()}_${linkCounter}`;
+            const currentUrl = window.location.origin + window.location.pathname;
+            let trackingLink = `${currentUrl}?tracking_id=${trackingId}&campaign=${encodeURIComponent(campaignName)}`;
             
-            // Generate unique tracking ID
-            const trackingId = `track_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            const baseUrl = window.location.origin + window.location.pathname;
-            const trackingLink = `${baseUrl}?tracking_id=${trackingId}&campaign=${encodeURIComponent(campaignName)}${targetUrl ? `&redirect=${encodeURIComponent(targetUrl)}` : ''}`;
+            if (targetUrl) {
+                trackingLink += `&redirect=${encodeURIComponent(targetUrl)}`;
+            }
             
             generatedLinkInput.value = trackingLink;
             generatedLinkContainer.style.display = 'block';
-            
-            // Reset form
             campaignNameInput.value = '';
             targetUrlInput.value = '';
         });
         
-        // Copy link to clipboard
         copyLinkBtn.addEventListener('click', () => {
             generatedLinkInput.select();
             document.execCommand('copy');
             copyLinkBtn.textContent = 'Copied!';
-            setTimeout(() => {
-                copyLinkBtn.textContent = 'Copy';
-            }, 2000);
+            setTimeout(() => copyLinkBtn.textContent = 'Copy', 2000);
         });
         
-        // Add mock tracking data (simulate user interactions)
-        function addMockTrackingData() {
-            const mockData = [
-                {
-                    id: 'track_1',
-                    campaign: 'Summer Sale 2024',
-                    timestamp: new Date(Date.now() - 3600000).toISOString(),
-                    ipAddress: '192.168.1.100',
-                    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    photo: 'https://placehold.co/400x300/1a2a6c/white?text=Photo+1'
-                },
-                {
-                    id: 'track_2',
-                    campaign: 'Newsletter Signup',
-                    timestamp: new Date(Date.now() - 7200000).toISOString(),
-                    ipAddress: '192.168.1.101',
-                    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)',
-                    photo: 'https://placehold.co/400x300/b21f1f/white?text=Photo+2'
-                },
-                {
-                    id: 'track_3',
-                    campaign: 'Product Launch',
-                    timestamp: new Date(Date.now() - 10800000).toISOString(),
-                    ipAddress: '192.168.1.102',
-                    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-                    photo: 'https://placehold.co/400x300/28a745/white?text=Photo+3'
-                }
-            ];
-            
-            // Add to tracking data if empty
-            if (trackingData.length === 0) {
-                trackingData = mockData;
-                localStorage.setItem('trackingData', JSON.stringify(trackingData));
-                renderTrackingData();
-            }
-        }
-        
-        // Render tracking data
         function renderTrackingData() {
             if (trackingData.length === 0) {
                 trackingList.innerHTML = `
                     <div class="empty-state">
-                        <div>📁</div>
                         <h3>No tracking data yet</h3>
                         <p>Generated tracking links will appear here when users interact with them</p>
+                        <p style="margin-top: 10px; font-size: 12px; color: #6c757d;">
+                            <strong>Note:</strong> Data is stored in memory. Refresh this page to see new captures.
+                        </p>
                     </div>
                 `;
                 totalTracks.textContent = 'Total: 0 entries';
@@ -385,75 +424,40 @@
             }
             
             totalTracks.textContent = `Total: ${trackingData.length} entries`;
-            
             trackingList.innerHTML = trackingData.map(item => {
                 const date = new Date(item.timestamp);
                 return `
                     <div class="tracking-item">
-                        <div class="tracking-info">
-                            <div class="info-item">
-                                <div class="info-label">Campaign</div>
-                                <div class="info-value">${item.campaign}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Date & Time</div>
-                                <div class="info-value">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">IP Address</div>
-                                <div class="info-value">${item.ipAddress}</div>
-                            </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong>${item.campaign}</strong>
+                            <small>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
                         </div>
-                        <div style="text-align: center;">
-                            <img src="${item.photo}" alt="Captured photo" class="photo-preview" data-photo="${item.photo}">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                            IP: ${item.ipAddress} | ID: ${item.id.substring(0, 15)}...
                         </div>
-                        <div style="margin-top: 10px; font-size: 12px; color: #6c757d;">
-                            User Agent: ${item.userAgent.substring(0, 50)}...
-                        </div>
+                        <img src="${item.photo}" alt="Captured photo" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                        ${item.redirectUrl ? `<div style="margin-top: 5px; font-size: 12px; color: #28a745;">Redirects to: ${item.redirectUrl}</div>` : ''}
                     </div>
                 `;
             }).join('');
-            
-            // Add click event to photo previews
-            document.querySelectorAll('.photo-preview').forEach(img => {
-                img.addEventListener('click', () => {
-                    modalPhoto.src = img.dataset.photo;
-                    photoModal.style.display = 'flex';
-                });
-            });
         }
         
-        // Close modal
-        closeModalBtn.addEventListener('click', () => {
-            photoModal.style.display = 'none';
+        // Manual refresh button
+        refreshDataBtn.addEventListener('click', () => {
+            renderTrackingData();
+            refreshDataBtn.textContent = 'Refreshing...';
+            setTimeout(() => {
+                refreshDataBtn.textContent = '✅ Refreshed';
+                setTimeout(() => {
+                    refreshDataBtn.textContent = '🔄 Refresh';
+                }, 2000);
+            }, 500);
         });
         
-        photoModal.addEventListener('click', (e) => {
-            if (e.target === photoModal) {
-                photoModal.style.display = 'none';
-            }
-        });
-        
-        // Initialize
-        addMockTrackingData();
-        renderTrackingData();
-        
-        // Simulate new tracking data (for demo purposes)
-        setInterval(() => {
-            if (Math.random() > 0.8 && trackingData.length < 10) {
-                const newEntry = {
-                    id: `track_${Date.now()}`,
-                    campaign: `Auto Campaign ${trackingData.length + 1}`,
-                    timestamp: new Date().toISOString(),
-                    ipAddress: `192.168.1.${100 + trackingData.length}`,
-                    userAgent: 'Mozilla/5.0 (Demo User Agent)',
-                    photo: `https://placehold.co/400x300/${Math.floor(Math.random()*16777215).toString(16)}/white?text=Demo+${trackingData.length + 1}`
-                };
-                trackingData.unshift(newEntry);
-                localStorage.setItem('trackingData', JSON.stringify(trackingData));
-                renderTrackingData();
-            }
-        }, 30000);
+        // Auto-refresh every 3 seconds when on admin page
+        if (!trackingId || !trackingId.startsWith('track_')) {
+            setInterval(renderTrackingData, 3000);
+        }
     </script>
 </body>
 </html>
